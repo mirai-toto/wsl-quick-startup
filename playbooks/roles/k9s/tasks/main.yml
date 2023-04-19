@@ -1,0 +1,16 @@
+- name: Extract tar.gz archive
+  unarchive:
+    src: https://github.com/derailed/k9s/releases/download/v0.26.6/k9s_Linux_x86_64.tar.gz
+    dest: /usr/local/bin
+    remote_src: true
+    mode: 0755
+  become: true
+  tags: ['k9s']
+
+- name: Change ownership of k9s binary
+  file:
+    path: /usr/local/bin/k9s
+    owner: root
+    group: root
+  become: true
+  tags: ['k9s']

@@ -1,0 +1,62 @@
+- name: Capture OS name
+  shell: "uname -s"
+  register: os_name
+  tags: ['docker']
+
+- name: Capture machine architecture
+  shell: "uname -m"
+  register: machine_arch
+  tags: ['docker']
+
+- name: Add Docker repository key
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+    keyring: /etc/apt/keyrings/docker.gpg
+  
+- name: Add Docker repository
+  become: true
+  apt_repository:
+    repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+    state: present
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  tags: ['docker']
+
+- name: Install Docker
+  become: true
+  apt:
+    name: docker-ce
+    state: latest
+  tags: ['docker']
+
+- name: Check if Docker is installed
+  stat:
+    path: /usr/bin/docker
+  register: docker_installed
+  tags: ['docker']
+
+- name: Stop playbook if Docker is not installed
+  fail:
+    msg: "Docker is not installed"
+  when: not docker_installed.stat.exists
+  tags: ['docker']
+
+- name: Install Docker Compose
+  become: true
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ os_name.stdout }}-{{ machine_arch.stdout }}
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  tags: ['docker']
+
+- name: Add user to docker group
+  user:
+    name: "{{ user }}"
+    groups: docker
+    append: yes
+  become: true
+  tags: ['docker']

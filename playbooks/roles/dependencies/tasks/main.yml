@@ -1,0 +1,26 @@
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: "yes"
+    update_cache: "yes"
+    cache_valid_time: 86400
+  tags: ['dependencies']
+
+- name: Install dependencies
+  become: true
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg2
+      - software-properties-common
+      - python3-pip
+      - openjdk-11-jdk
+    state: latest
+  tags: ['dependencies']
+
+- name: Install pexpect with pip
+  pip:
+    name: pexpect>=3.3
+  tags: ['dependencies']

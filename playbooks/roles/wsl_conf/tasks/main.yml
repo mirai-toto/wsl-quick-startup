@@ -1,0 +1,36 @@
+- name: Check if /etc/wsl.conf exists
+  stat:
+    path: /etc/wsl.conf
+  register: wsl_conf
+  tags: ['wsl']
+
+- name: Create /etc/wsl.conf
+  become: true
+  copy:
+    content: |
+      [boot]
+      systemd=true
+      [automount]
+      options = "metadata"
+    dest: /etc/wsl.conf
+  when: not wsl_conf.stat.exists
+  tags: ['wsl']
+
+- name: Fail if /etc/wsl.conf was not created
+  fail:
+    msg: "The /etc/wsl.conf already exists, you need to restart the WSL distro with wsl.exe --shutdown"
+  when: not wsl_conf.stat.exists
+  tags: ['wsl']
+
+- name: Check if systemctl works
+  command: systemctl status
+  register: systemctl_output
+  failed_when: "'System has not been booted with systemd as init system' in systemctl_output.stderr or 'Failed to connect to bus' in systemctl_output.stderr"
+  tags: ['wsl']
+  ignore_errors: true
+
+- name: Stop playbook if systemctl is not enabled
+  fail:
+    msg: "Systemd is not enabled, try to restart the WSL distro with wsl.exe --shutdown"
+  when: systemctl_output.failed
+  tags: ['wsl']

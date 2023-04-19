@@ -1,0 +1,33 @@
+# Name of the WSL instance
+distro_name=UbuntuTest
+
+# Installation directory path
+install_dir=%userprofile%\VMs
+
+# Iso file path
+iso_file=%userprofile%\Downloads\ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz
+
+# Install font
+install_font=false
+
+#############################################################################################
+##################################### Advanced Settings #####################################
+#############################################################################################
+
+# Target directory for wsl-quick-startup project
+target_dir=/root/wsl-quick-startup
+
+# Update WSL settings
+update_wsl_settings=true
+
+# WSL settings file path
+wsl_settings_file=/mnt/c/Users/miout/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json
+
+# Installed font name for the WSL instance
+font_name=DroidSansM Nerd Font Mono
+
+# Use acrylic for the WSL instance
+use_acrylic=true
+
+# opacity for the WSL instance
+opacity=90

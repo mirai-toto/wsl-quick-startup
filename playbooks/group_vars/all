@@ -1,0 +1,56 @@
+# Group variables for all hosts
+# -------------------------------------
+# This file defines variables that are specific to the web_servers group of hosts.
+# These variables will be used by playbooks that target all hosts.
+
+# Prefer k3s over kubeadm
+use_k3s : true
+
+# User variables
+user: my-user
+create_user: true
+user_password: password
+
+# Helm installation version
+helm:
+  version: v3.0.0
+
+# Install Zsh
+install_zsh: true
+
+# Proxy settings
+proxy_parameters:
+  use_proxy: false
+  https_proxy: "HTTPS_PROXY_URL"
+  http_proxy: "HTTP_PROXY_URL"
+  no_proxy: "NO_PROXY_URL"
+
+###############################################################
+### /!\ Do not change unless you need to add other plugins! ###
+###############################################################
+
+# Oh My Zsh installation responses
+oh_my_zsh_responses:
+  Do you want to change your default shell to zsh\? \[Y/n\]: 'Y'
+  Do you want to continue\? \[Y/n\]: 'Y'
+
+# Oh My Zsh plugins
+# they will be cloned like git clone https://github.com/${project_user}/${project_name} ~/.oh-my-zsh/custom/${type}/${project_name}
+
+oh_my_zsh_plugins:
+  - type: themes
+    project_user: romkatv
+    project_name: powerlevel10k
+  - type: plugins
+    project_user: zsh-users
+    project_name: zsh-autosuggestions
+  - type: plugins
+    project_user: zsh-users
+    project_name: zsh-syntax-highlighting
+  - type: plugins
+    project_user: zsh-users
+    project_name: zsh-completions
+
+###############################################################
+###############################################################
+###############################################################

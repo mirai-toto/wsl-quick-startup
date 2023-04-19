@@ -1,0 +1,39 @@
+- name: Download k3s installer
+  get_url: 
+    url: https://get.k3s.io
+    dest: /usr/local/bin/k3s
+    mode: 0755
+  become: true
+  tags: ['k3s']
+
+- name: Execute the k3s installer
+  shell: /usr/local/bin/k3s --write-kubeconfig-mode 644 --docker
+  become: true
+  tags: ['k3s']
+
+- name: Check if k3s is installed
+  command: kubectl version --client
+  register: kubectl_version
+  ignore_errors: true
+  tags: ['k3s']
+
+- name: Stop playbook if k3s is not installed
+  fail:
+    msg: "k3s is not installed"
+  when: "'Client Version' not in kubectl_version.stdout"
+  tags: ['k3s']
+
+- name: Create .kube directory if it doesn't exist
+  file:
+    path: "/home/{{ user }}/.kube"
+    state: directory
+    mode: '0755'
+  tags: ['k3s']
+
+- name: Create symbolic link for k3s config
+  become: true
+  file:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/{{ user }}/.kube/config
+    state: link
+  tags: ['k3s']

@@ -1,0 +1,16 @@
+- name: Create user
+  become: true
+  user:
+    name: "{{ user }}"
+    state: present
+    password: "{{ user_password | password_hash('sha512') }}"
+  tags: ['user']
+
+- name: Make user sudoer
+  become: true
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^{{ user }}\s'
+    line: '{{ user }} ALL=(ALL) NOPASSWD:ALL'
+  tags: ['user']

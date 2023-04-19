@@ -1,0 +1,35 @@
+- name: Create .local/bin directory if it doesn't exist
+  file:
+    path: /home/{{ user }}/.local/bin
+    state: directory
+    mode: '0755'
+  tags: ['k3s-scripts']
+
+- name: Create k3s-start.sh file
+  copy:
+    content: |
+      #!/bin/bash
+      sudo k3s server --write-kubeconfig-mode 644 --docker &
+    dest: /home/{{ user }}/.local/bin/k3s-start.sh
+    mode: '0755'
+  tags: ['k3s-scripts']
+
+- name: Create k3s-shutdown.sh file
+  copy:
+    content: |
+      #!/bin/bash
+      /usr/local/bin/k3s-killall.sh
+      ps -e -o pid,cmd | grep "k3s server" | grep -v grep | awk '{print {{ user }} };' | xargs sudo kill -9
+    dest: /home/{{ user }}/.local/bin/k3s-shutdown.sh
+    mode: '0755'
+  tags: ['k3s-scripts']
+
+- name: Add ~/.local/bin to PATH in ~/.profile
+  become: true
+  lineinfile:
+    path: "/home/{{ user }}/.profile"
+    line: 'export PATH="/home/{{ user }}/.local/bin:$PATH"'
+    create: yes
+    state: present
+    insertafter: EOF
+  tags: ['k3s-scripts']

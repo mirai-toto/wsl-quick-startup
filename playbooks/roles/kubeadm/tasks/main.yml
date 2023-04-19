@@ -1,0 +1,35 @@
+- name: Add Kubernetes APT key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  tags: ['kubeadm']
+
+- name: Add Kubernetes APT repository
+  become: true
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+  tags: ['kubeadm']
+
+- name: Install Kubernetes
+  become: true
+  apt:
+    name:
+      - kubeadm
+      - kubelet
+      - kubectl
+    state: present
+  tags: ['kubeadm']
+
+- name: Check if Kubernetes is installed
+  command: kubectl version --client
+  ignore_errors: true
+  register: kubectl_version
+  tags: ['kubeadm']
+
+- name: Stop playbook if Kubernetes is not installed
+  fail:
+    msg: "Kubernetes is not installed."
+  when: "'Client Version' not in kubectl_version.stdout"
+  tags: ['kubeadm']

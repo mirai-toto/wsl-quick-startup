@@ -1,0 +1,12 @@
+- name: Configure vim
+  lineinfile:
+    path: "/home/{{ user }}/.vimrc"
+    line: |
+      set nocompatible
+      set expandtab tabstop=2 shiftwidth=2
+      set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
+      set number
+      set encoding=utf-8
+    state: present
+    insertafter: EOF
+  tags: ['proxy-settings']

@@ -1,0 +1,10 @@
+- name: Install utilities
+  become: true
+  apt:
+    name:
+      - npm
+      - bat
+      - neofetch
+      - python3
+    state: latest
+  tags: ['utilities']
