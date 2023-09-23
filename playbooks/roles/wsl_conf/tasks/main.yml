@@ -1,3 +1,21 @@
+### Because of a bug in WSL, the binfmt_misc is not working properly ###
+- name: Check if /usr/lib/binfmt.d/WSLInterop.conf exists
+  stat:
+    path: /usr/lib/binfmt.d/WSLInterop.conf
+  register: WSLInterop_conf
+  tags: ['wsl']
+
+- name: Fix binfmt_misc
+  become: true
+  copy:
+    content: |
+      :WSLInterop:M::MZ::/init:PF
+    dest: /usr/lib/binfmt.d/WSLInterop.conf
+  when: not WSLInterop_conf.stat.exists
+  tags: ['wsl']
+
+### Creating a /etc/wsl.conf file to enable systemd ###
+
 - name: Check if /etc/wsl.conf exists
   stat:
     path: /etc/wsl.conf

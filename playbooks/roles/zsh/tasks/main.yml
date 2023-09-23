@@ -56,18 +56,16 @@
     msg: "To use zsh, please run the command 'zsh' or start a new session."
   tags: ['zsh']
 
-- name: Copy .zshrc to user home directory
-  copy:
-    src: "/root/.zshrc"
-    dest: "/home/{{ user }}/"
+- name: Move .zshrc to user home directory
+  command:
+    cmd: mv /root/.zshrc /home/{{ user }}/
   become: true
   become_user: root
   tags: ['zsh']
 
-- name: Copy .oh-my-zsh to user home directory
-  copy:
-    src: "/root/.oh-my-zsh"
-    dest: "/home/{{ user }}/"
+- name: Move .oh-my-zsh to user home directory
+  command:
+    cmd: mv /root/.oh-my-zsh /home/{{ user }}/
   become: true
   become_user: root
   tags: ['zsh']
@@ -99,3 +97,15 @@
     shell: /bin/zsh
   tags: ['zsh']
 
+- name: Add custom aliases to .zshrc
+  lineinfile:
+    path: /home/{{ user }}/.zshrc
+    line: |
+      NodeIp=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+      alias helm_clean="helm ls --all --short | xargs -L1 helm delete"
+      alias k8s_ip="echo $NodeIp"
+      alias bat="batcat"
+    insertbefore: EOF
+  become: true
+  become_user: "{{ user }}"
+  tags: ['zsh']

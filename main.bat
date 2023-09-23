@@ -1,20 +1,36 @@
 @echo off
-
 setlocal enabledelayedexpansion
+
+REM Check if WSL is installed
+wsl.exe --status >NUL 2>&1
+if %errorlevel% equ 0 (
+    echo "WSL is installed."
+) else (
+    echo "WSL is not installed. Please install it first."
+    exit /b 1
+)
 
 REM Read configuration file
 set config_file=config.txt
+REM Loop through each line in the config file
 for /f "tokens=1,* delims=#=" %%a in ('type %config_file% ^| findstr "="') do (
     set var_name=%%a
     set var_value=%%b
-    REM Set variable
-    for /f %%i in ('call ./utils/parse_config_line.bat "!var_value!"') do set "!var_name!=%%i"
+    REM Set variable by calling parse_config_line to handle value parsing
+    for /f "tokens=* delims=" %%i in ('call ./utils/parse_config_line.bat "!var_value!"') do set "!var_name!=%%i"
 )
 
 REM Create installation directory if it doesn't exist
 if not exist "%install_dir%" (
     mkdir "%install_dir%"
     echo "Installation directory created: %install_dir%"
+)
+
+REM Check if iso_file exists
+if not exist "%iso_file%" (
+    echo "Downloading iso_file from %default_iso_url%..."
+    powershell.exe -Command "Invoke-WebRequest %default_iso_url% -OutFile \"%iso_file%\""
+    echo "Downloaded iso_file from %default_iso_url% to %iso_file%."
 )
 
 REM Check if WSL instance exists
@@ -27,7 +43,8 @@ if %errorlevel% equ 0 (
     wsl.exe --import %distro_name% %install_dir%\%distro_name% %iso_file% --version 2
     wsl.exe -d %distro_name% -- echo "WSL instance created successfully."
 )
-echo "Installation finished."
+
+echo "WSL instance created successfully"
 
 REM Create target directory if it does not exist
 echo "Creating target directory..."
@@ -59,8 +76,8 @@ wsl.exe -d %distro_name% -- sudo ansible-playbook %target_dir%/playbooks/setup-w
 
 REM Download DroidSansMono.zip, extract it and install the font
 if "%install_font%"=="true" (
-REM Check if font is installed
-    reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" | find /i "DroidSansMNerdFontMono-Regular.otf" && (
+    REM Check if font is installed
+    reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" | findstr /i "DroidSansMNerdFontMono-Regular.otf" > nul && (
         echo "Font already installed."
     ) || (
         REM Download font archive
@@ -79,7 +96,8 @@ REM Check if font is installed
     if "%update_wsl_settings%"=="true" (
         REM Use jq to update the profile
         echo "Update Wsl settings to use Droid Sans Mono Font"
-        wsl.exe -d %distro_name% -- sh -c "chmod +x %target_dir%/playbooks/files/update_wsl_settings.sh && bash %target_dir%/playbooks/files/update_wsl_settings.sh %distro_name% '%font_name%' %use_acrylic% %opacity% %wsl_settings_file%"
+        wsl.exe -d %distro_name% -- sh -c "chmod +x %target_dir%/playbooks/files/update_wsl_settings.sh"
+        wsl.exe -d %distro_name% -- sh -c "bash %target_dir%/playbooks/files/update_wsl_settings.sh \"%distro_name%\" \"%font_name%\" \"%use_acrylic%\" %opacity% %wsl_settings_file%"
     )
 )
 

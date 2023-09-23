@@ -9,11 +9,11 @@ use_k3s : true
 # User variables
 user: my-user
 create_user: true
-user_password: password
+user_password: root
 
 # Helm installation version
 helm:
-  version: v3.0.0
+  version: v3.12.2
 
 # Install Zsh
 install_zsh: true

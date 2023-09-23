@@ -38,7 +38,7 @@ Sure, here is an updated version of the Usage section in table format with colum
 
 | Name | Description | Example |
 |------|-------------|---------|
-| `distro_name` | The name of the Linux distribution that will be installed. | UbuntuTest |
+| `distro_name` | The name of the Linux distribution that will be installed. | UbuntuWsl |
 | `install_dir` | The directory where the WSL instance will be installed. | %userprofile%\VMs |
 | `iso_file` | The path to the Linux distribution tar file. | %userprofile%\ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz |
 | `install_font` | Boolean value to determin whether to install font or not. | true |
@@ -50,7 +50,7 @@ Sure, here is an updated version of the Usage section in table format with colum
 | use_k3s                | Boolean value to determine whether to use k3s or kubeadm.         | `true`                                                           |
 | user                   | The username to create or use.                                    | `my-user`                                                        |
 | create_user            | Boolean value to determine whether to create the user or not.     | `true`                                                           |
-| user_password          | The password for the user.                                        | `password`                                                       |
+| user_password          | The password for the user.                                        | `root`                                                       |
 | helm.version           | The version of Helm to install.                                   | `v3.0.0`                                                         |
 | install_zsh            | Boolean value to determine whether to install Zsh or not.         | `true`                                                           |
 | proxy_parameters.use_proxy | Boolean value to determine whether to use a proxy or not.     | `false` |

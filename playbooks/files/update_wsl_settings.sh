@@ -13,13 +13,20 @@ use_acrylic="$3"
 opacity="$4"
 wsl_settings_file="$5"
 
-distro_name="\"${distro_name}\""
-font_name="\"${font_name}\""
-
 # Build jq query
-query='.profiles.list[] |= if .name == $distro_name then . + {font: {face: $font_name}, useAcrylic: $use_acrylic, opacity: $opacity } else . end'
-# Execute jq and save output to file
-jq --arg distro_name "$distro_name" --arg font_name "$font_name" --argjson use_acrylic "$use_acrylic" --argjson opacity "$opacity" "$query" "$wsl_settings_file" > output
+query=".profiles.list[] |= if .name == \"$distro_name\" then . + {font: {face: \"$font_name\"}, useAcrylic: $use_acrylic, opacity: $opacity } else . end"
 
-# Print success message
+# Execute jq and save output to file
+jq --arg distro_name "$distro_name" \
+  --arg font_name "$font_name" \
+  --argjson use_acrylic $use_acrylic \
+  --argjson opacity $opacity \
+  "$query" "$wsl_settings_file" > setting_updated_output.json
+
+# Check if source file is not empty and replace the content of the destination file
+if [[ -s "setting_updated_output.json" ]]; then
+  cat "setting_updated_output.json" > "$wsl_settings_file"
+fi
+
+
 echo "Settings updated and written to output file."
