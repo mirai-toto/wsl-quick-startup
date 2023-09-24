@@ -10,12 +10,6 @@
     - name: proxy
       when: proxy_parameters.use_proxy
 
-- name: K3s scripts playbook
-  hosts: host
-  roles:
-    - name: k3s-scripts
-      when: use_k3s
-
 - name: WSL conf playbook
   hosts: host
   roles:
@@ -63,3 +57,9 @@
   roles:
     - name: zsh
       when: install_zsh
+
+- name: K3s scripts playbook
+  hosts: host
+  roles:
+    - name: k3s-scripts
+      when: use_k3s

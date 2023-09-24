@@ -33,3 +33,13 @@
     state: present
     insertafter: EOF
   tags: ['k3s-scripts']
+
+- name: Add ~/.local/bin to PATH in ~/.zprofile
+  become: true
+  lineinfile:
+    path: "/home/{{ user }}/.zprofile"
+    line: 'export PATH="/home/{{ user }}/.local/bin:$PATH"'
+    create: yes
+    state: present
+    insertafter: EOF
+  tags: ['k3s-scripts']
