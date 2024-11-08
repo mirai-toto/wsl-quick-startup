@@ -5,11 +5,11 @@
       - npm
       - bat
       - neofetch
-      - python3
     state: latest
   tags: ['utilities']
 
 - name: Install http-prompt with pip
   pip:
     name: http-prompt
+    virtualenv: /opt/venv
   tags: ['utilities']

@@ -172,7 +172,7 @@ if %errorlevel% neq 0 (
 
 REM Run the proxy setup script inside WSL
 echo Setting up proxy settings inside WSL...
-wsl.exe -d %distro_name% -- bash %target_dir%/utils/setup-apt-proxy.sh "%http_proxy_wsl%" "%https_proxy_wsl%"
+wsl.exe -d %distro_name% -- bash %target_dir%/utils/setup-apt-proxy.sh "%http_proxy_wsl%" "%https_proxy_wsl%" "%no_proxy_wsl%"
 if %errorlevel% neq 0 (
     echo Failed to execute setup-apt-proxy.sh.
     echo Error: Failed to set up proxy >> %LOG_FILE%

@@ -1,65 +1,37 @@
-- name: User playbook
+- name: Global Playbook
   hosts: host
+  become: true
+  environment:
+    http_proxy: "{{ proxy_parameters.http_proxy }}"
+    https_proxy: "{{ proxy_parameters.https_proxy }}"
+    no_proxy: "{{ proxy_parameters.no_proxy }}"
   roles:
     - name: user
       when: create_user
 
-- name: Proxy playbook
-  hosts: host
-  roles:
     - name: proxy
       when: proxy_parameters.use_proxy
 
-- name: WSL conf playbook
-  hosts: host
-  roles:
     - name: wsl_conf
 
-- name: Dependencies playbook
-  hosts: host
-  roles:
     - name: dependencies
 
-- name: Utilities playbook
-  hosts: host
-  roles:
     - name: utilities
 
-- name: Docker playbook
-  hosts: host
-  roles:
     - name: docker
 
-- name: K3s playbook
-  hosts: host
-  roles:
     - name: k3s
       when: use_k3s
 
-- name: Kubeadm playbook
-  hosts: host
-  roles:
     - name: kubeadm
       when: not use_k3s
 
-- name: Helm playbook
-  hosts: host
-  roles:
     - name: helm
 
-- name: K9s playbook
-  hosts: host
-  roles:
     - name: k9s
 
-- name: Zsh playbook
-  hosts: host
-  roles:
     - name: zsh
       when: install_zsh
 
-- name: K3s scripts playbook
-  hosts: host
-  roles:
     - name: k3s-scripts
       when: use_k3s

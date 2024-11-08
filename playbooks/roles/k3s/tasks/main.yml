@@ -37,3 +37,15 @@
     dest: /home/{{ user }}/.kube/config
     state: link
   tags: ['k3s']
+
+- name: Check if Kubernetes is installed
+  command: kubectl version --client
+  ignore_errors: true
+  register: kubectl_version
+  tags: ['k3s']
+
+- name: Stop playbook if Kubernetes is not installed
+  fail:
+    msg: "Kubernetes is not installed."
+  when: "'Client Version' not in kubectl_version.stdout"
+  tags: ['k3s']

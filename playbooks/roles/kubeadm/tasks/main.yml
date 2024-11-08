@@ -1,14 +1,19 @@
-- name: Add Kubernetes APT key
+- name: Create directory for Kubernetes keyring
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
   become: true
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
-  tags: ['kubeadm']
+
+- name: Add Kubernetes APT key
+  shell: "curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg -o /etc/apt/keyrings/kubernetes.asc"
+  args:
+    creates: /etc/apt/keyrings/kubernetes.asc
+  become: true
 
 - name: Add Kubernetes APT repository
-  become: true
   apt_repository:
-    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/kubernetes.asc] https://apt.kubernetes.io/ kubernetes-xenial main"
     state: present
   tags: ['kubeadm']
 

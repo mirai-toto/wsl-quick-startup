@@ -1,32 +1,52 @@
 - name: Add proxy parameter to ~/.profile
-  lineinfile:
-    path: "/home/{{ user }}/.profile"
-    line: |
+  copy:
+    dest: "{{ item }}/.profile"
+    content: |
+      # set PATH so it includes user's private bin if it exists
+      if [ -d "$HOME/bin" ] ; then
+          PATH="$HOME/bin:$PATH"
+      fi
+
+      # set PATH so it includes user's private bin if it exists
+      if [ -d "$HOME/.local/bin" ] ; then
+          PATH="$HOME/.local/bin:$PATH"
+      fi
+
       export https_proxy={{ proxy_parameters.https_proxy }}
       export HTTPS_PROXY=${https_proxy}
       export http_proxy={{ proxy_parameters.http_proxy }}
       export HTTP_PROXY=${http_proxy}
       export no_proxy="{{ proxy_parameters.no_proxy }}"
-    create: yes
-    state: present
-    insertafter: EOF
+  loop:
+   - "/home/{{ user }}" 
+   - "/root" 
   tags: ['proxy-settings']
 
+- name: Ensure .profile is sourced in .bashrc
+  lineinfile:
+    path: "{{ item }}/.bashrc"
+    line: "source ~/.profile"
+    insertafter: EOF
+    state: present
+  loop:
+   - "/home/{{ user }}" 
+   - "/root" 
+  tags: ['proxy-settings']
+
+# Not needed when run with main.bat
 - name: Add proxy parameter to /etc/apt/apt.conf
   become: true
-  lineinfile:
-    path: "/etc/apt/apt.conf"
-    line: |
+  copy:
+    dest: "/etc/apt/apt.conf"
+    content: |
       Acquire::http::Proxy "{{ proxy_parameters.http_proxy }}";
       Acquire::https::Proxy "{{ proxy_parameters.https_proxy }}";
-    state: present
-    insertafter: EOF
   tags: ['proxy-settings']
 
 - name: Add proxy parameter to ~/.gitconfig
-  lineinfile:
-    path: "/home/{{ user }}/.gitconfig"
-    line: |
+  copy:
+    dest: "{{ item }}/.gitconfig"
+    content: |
       [url "https://"]
       insteadOf = git://
       [credential]
@@ -35,24 +55,16 @@
       proxy = {{ proxy_parameters.https_proxy }}
       [http]
       proxy = {{ proxy_parameters.http_proxy }}
-    create: yes
-    state: present
-    insertafter: EOF
+  loop:
+   - "/home/{{ user }}" 
+   - "/root" 
   tags: ['proxy-settings']
 
-- name: Add proxy parameter to ~/.gitconfig
-  lineinfile:
-    path: "/home/{{ user }}/.gitconfig"
-    line: |
-      [url "https://"]
-      insteadOf = git://
-      [credential]
-      helper = store
-      [https]
-      proxy = {{ proxy_parameters.https_proxy }}
-      [http]
+- name: Add proxy parameter to /etc/pip.conf
+  copy:
+    dest: "/etc/pip.conf"
+    content: |
+      [global]
       proxy = {{ proxy_parameters.http_proxy }}
-    create: yes
-    state: present
-    insertafter: EOF
+      https_proxy = {{ proxy_parameters.https_proxy }}
   tags: ['proxy-settings']
