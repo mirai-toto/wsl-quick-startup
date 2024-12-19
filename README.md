@@ -33,25 +33,31 @@ WSL Quick Startup is an Ansible-based project designed to install and configure 
   ```
 
 ## Configuration
-
 ### Main Configuration `config.cfg`
 
-| Name                | Description                                                      | Example                                                  |
-|---------------------|------------------------------------------------------------------|----------------------------------------------------------|
-| distro_name         | Name of the WSL distribution to be installed.                    | NewUbuntuWsl                                             |
-| install_dir         | Directory where the WSL instance will be installed.              | %userprofile%\VMs                                        |
-| iso_file            | Path to the Linux distribution tar file.                         | %userprofile%\Downloads\ubuntu-noble-wsl-amd64-ubuntu.rootfs.tar.gz |
-| default_iso_url     | URL to download ISO if none is provided.                         | <https://cloud-images.ubuntu.com/wsl/noble/...>          |
-| target_dir          | Directory for wsl-quick-startup within WSL.                      | /root/wsl-quick-startup                                  |
-| customize_terminal  | Install terminal fonts and packages using winget.                | true                                                     |
-| http_proxy_wsl      | HTTP proxy for WSL.                                              | <http://proxy.example.com:8080>                          |
-| https_proxy_wsl     | HTTPS proxy for WSL.                                             | <https://proxy.example.com:8080>                         |
-| no_proxy_wsl        | Comma-separated list of hosts bypassing proxy.                   | localhost,127.0.0.1                                      |
-| dev_user            | Username to create in WSL.                                       | wsl-user                                                 |
-| dev_password        | Password for the created user.                                   | root                                                     |
-| use_k3s             | Use k3s instead of kubeadm for Kubernetes.                       | true                                                     |
+#### Table 1: Core Settings
 
-### Advanced Configuration `custom-config.cfg`
+| Name            | Description                                    | Example                          |
+|-----------------|------------------------------------------------|----------------------------------|
+| distro_name     | Name of the WSL distribution to be installed.  | NewUbuntuWsl                     |
+| dev_user        | Username to create in WSL.                     | wsl-user                         |
+| dev_password    | Password for the created user.                 | root                             |
+| http_proxy_wsl  | HTTP proxy for WSL.                            | <http://proxy.example.com:8080>  |
+| https_proxy_wsl | HTTPS proxy for WSL.                           | <https://proxy.example.com:8080> |
+| no_proxy_wsl    | Comma-separated list of hosts bypassing proxy. | localhost,127.0.0.1              |
+| use_k3s         | Use k3s instead of kubeadm for Kubernetes.     | true                             |
+
+#### Table 2: Additional Settings
+
+| Name                | Description                                                      | Example                                                  |
+|---------------------|-----------------------------------------------------|--------------------------------------------------|
+| install_dir         | Directory where the WSL instance will be installed. | %userprofile%\VMs                                |
+| iso_file            | Path to the Linux distribution tar file.            | %userprofile%\Downloads\ubuntu-noble-wsl-amd64-ubuntu.rootfs.tar.gz |
+| default_iso_url     | URL to download ISO if none is provided.            | <https://cloud-images.ubuntu.com/wsl/noble/...>  |
+| target_dir          | Directory for wsl-quick-startup within WSL.         | /root/wsl-quick-startup                          |
+| customize_terminal  | Install terminal fonts and packages using winget.   | false                                            |
+
+### Custom Configuration `custom-config.cfg`
 
 | Name                 | Description                                                     | Example                                                  |
 |----------------------|-----------------------------------------------------------------|----------------------------------------------------------|
