@@ -1,5 +1,41 @@
 # WSLSetup.ps1
 
+function IsFeatureEnabled {
+    param (
+        [string]$FeatureName
+    )
+
+    Write-Host "Checking if feature $FeatureName is enabled..."
+    $output = dism.exe /online /Get-FeatureInfo /FeatureName:$FeatureName | Select-String "State : Enabled"
+    return $output -ne $null
+}
+
+function EnableFeature {
+    param (
+        [string]$FeatureName
+    )
+
+    if (IsFeatureEnabled -FeatureName $FeatureName) {
+        Write-Host "$FeatureName is already enabled."
+        return
+    }
+
+    Write-Host "Enabling feature $FeatureName..."
+    try {
+        dism.exe /online /enable-feature /featurename:$FeatureName /all /norestart
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Error: Failed to enable feature $FeatureName."
+            "Error: Failed to enable feature $FeatureName" | Out-File -FilePath $LOG_FILE -Append
+            exit 1
+        }
+        Write-Host "Feature $FeatureName enabled successfully."
+    } catch {
+        Write-Host "Error: Unable to enable feature $FeatureName."
+        "Error: Unable to enable feature $FeatureName" | Out-File -FilePath $LOG_FILE -Append
+        exit 1
+    }
+}
+
 function UpdateWSL {
     Write-Host "Updating WSL to the latest version..."
     try {
@@ -18,37 +54,11 @@ function UpdateWSL {
 }
 
 function EnableWSLFeature {
-    Write-Host "Enabling WSL feature..."
-    try {
-        dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "Error: Failed to enable WSL feature."
-            "Error: Failed to enable WSL feature" | Out-File -FilePath $LOG_FILE -Append
-            exit 1
-        }
-        Write-Host "WSL feature enabled successfully."
-    } catch {
-        Write-Host "Error: Unable to enable WSL feature."
-        "Error: Unable to enable WSL feature" | Out-File -FilePath $LOG_FILE -Append
-        exit 1
-    }
+    EnableFeature -FeatureName "Microsoft-Windows-Subsystem-Linux"
 }
 
 function EnableVirtualMachinePlatform {
-    Write-Host "Enabling Virtual Machine Platform feature..."
-    try {
-        dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "Error: Failed to enable Virtual Machine Platform feature."
-            "Error: Failed to enable Virtual Machine Platform feature" | Out-File -FilePath $LOG_FILE -Append
-            exit 1
-        }
-        Write-Host "Virtual Machine Platform feature enabled successfully."
-    } catch {
-        Write-Host "Error: Unable to enable Virtual Machine Platform feature."
-        "Error: Unable to enable Virtual Machine Platform feature" | Out-File -FilePath $LOG_FILE -Append
-        exit 1
-    }
+    EnableFeature -FeatureName "VirtualMachinePlatform"
 }
 
 function EnsureWSLSetup {
