@@ -1,5 +1,11 @@
 # scripts/MainScript.ps1
 
+# Check for elevated privileges
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "This script must be run as an administrator. Please restart the script in an elevated PowerShell session." -ForegroundColor Red
+    exit 1
+}
+
 # Import helper scripts
 . "$PSScriptRoot\Initialize.ps1"
 . "$PSScriptRoot\ReadConfiguration.ps1"
