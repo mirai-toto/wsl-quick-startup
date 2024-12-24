@@ -19,6 +19,7 @@ $wingetPackages = @(
 InitializeScript
 
 CheckWSL
+EnsureWSLSetup
 
 ReadConfiguration -ConfigFilePath $CONFIG_FILE -CustomConfigFilePath $CUSTOM_CONFIG_FILE
 ValidateVariables
