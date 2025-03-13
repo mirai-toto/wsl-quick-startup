@@ -1,3 +1,6 @@
+# This AWK Script simply convert a cfg line to json line. For example:
+# var=value => {"var": "value"}
+# Empty values are ignored.
 BEGIN {
     print "{"
 }

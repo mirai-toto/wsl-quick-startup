@@ -1,40 +1,37 @@
 # scripts/MainScript.ps1
 
-# Check for elevated privileges
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "This script must be run as an administrator. Please restart the script in an elevated PowerShell session." -ForegroundColor Red
-    exit 1
-}
+# Define Paths
+$CONFIG_FILE = "$PSScriptRoot\..\config.cfg"
+$LOG_FILE = "$PSScriptRoot\..\logs\script.log"
+# Target directory for wsl-quick-startup project
+$TARGET_DIR="/root/wsl-quick-startup"
 
 # Import helper scripts
 . "$PSScriptRoot\Initialize.ps1"
-. "$PSScriptRoot\ReadConfiguration.ps1"
-. "$PSScriptRoot\ValidateVariables.ps1"
-. "$PSScriptRoot\PrepareInstallation.ps1"
+. "$PSScriptRoot\EnsureWSLIsoFile.ps1"
+. "$PSScriptRoot\CreateWSLInstance.ps1"
 . "$PSScriptRoot\WSLSetup.ps1"
-. "$PSScriptRoot\FileOperations.ps1"
+. "$PSScriptRoot\PrepareWSLEnvironment.ps1"
 . "$PSScriptRoot\RunAnsible.ps1"
-. "$PSScriptRoot\CustomizeTerminal.ps1"
 . "$PSScriptRoot\InstallWingetPackages.ps1"
+. "$PSScriptRoot\InstallWslVpnToolkit.ps1"
 
 $wingetPackages = @(
-    "equalsraf.win32yank"
+  "equalsraf.win32yank"
 )
 
 # Initialize Log File
 InitializeScript
-
-CheckWSL
-EnsureWSLSetup
-
-ReadConfiguration -ConfigFilePath $CONFIG_FILE -CustomConfigFilePath $CUSTOM_CONFIG_FILE
+ReadConfiguration -ConfigFilePath $CONFIG_FILE
 ValidateVariables
-PrepareInstallation
-ManageWSLInstance
+EnsureWSLInstallation
+EnsureWSLIsoFile "$wsl_install_dir\$wsl_instance_name" $wsl_default_iso_url $wsl_iso_file
+CreateWSLInstance $wsl_instance_name "$wsl_install_dir\$wsl_instance_name" $wsl_iso_file
 PrepareWSLEnvironment
 ExecuteAnsible
-CustomizeTerminal
+
 InstallWingetPackages -PackagesToInstall $wingetPackages
+InstallWslVpnToolkit
 
 Write-Host "Script finished successfully."
 "Script finished at $(Get-Date)" | Out-File -FilePath $LOG_FILE -Append
