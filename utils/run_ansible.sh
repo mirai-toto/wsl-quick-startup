@@ -3,11 +3,13 @@
 # run_ansible.sh
 # Usage: ./run_ansible.sh
 
-TARGET_DIR="/root/wsl-quick-startup"
-CONFIG_FILE="$TARGET_DIR/config.cfg"
-JSON_CONFIG="$TARGET_DIR/config.json"
-CONVERTER_SCRIPT="$TARGET_DIR/utils/cfg_to_json.sh"
-PLAYBOOK_DIR="$TARGET_DIR/playbooks"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+BASE_DIR="$(cd "$script_dir/.." && pwd)"
+
+CONFIG_FILE="$BASE_DIR/config.cfg"
+JSON_CONFIG="$BASE_DIR/config.json"
+CONVERTER_SCRIPT="$BASE_DIR/utils/cfg_to_json.sh"
+PLAYBOOK_DIR="$BASE_DIR/playbooks"
 
 # Function to check and load configuration
 convert_config_to_json() {
@@ -37,7 +39,7 @@ update_json_with_proxies() {
 
   # Add proxy parameters to JSON config
   jq \
-    --arg use_proxy "true" \
+    --argjson use_proxy true \
     --arg http_proxy "$http_proxy_wsl" \
     --arg https_proxy "$https_proxy_wsl" \
     --arg no_proxy "$no_proxy_wsl" \

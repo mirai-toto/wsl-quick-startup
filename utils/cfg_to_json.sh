@@ -1,6 +1,7 @@
 #!/bin/bash
 
-AWK_SCRIPT="/root/wsl-quick-startup/utils/convert.awk"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+AWK_SCRIPT="$script_dir/convert.awk"
 
 # Function to sanitize the input file
 sanitize_input() {
