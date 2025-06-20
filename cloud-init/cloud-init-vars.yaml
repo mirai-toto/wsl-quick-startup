@@ -1,0 +1,6 @@
+hostname: my-vm
+username: ubuntu
+user_password: "root"
+http_proxy: ""
+https_proxy: ""
+no_proxy: ""
