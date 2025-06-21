@@ -12,6 +12,7 @@ $config = [Environment]::ExpandEnvironmentVariables((Get-Content $configFile -Ra
 . "$PSScriptRoot\Setup-Wsl.ps1"
 . "$PSScriptRoot\Ensure-WslIsoFile.ps1"
 . "$PSScriptRoot\Install-WslVpnToolkit.ps1"
+. "$PSScriptRoot\Render-CloudInitTemplate.ps1"
 
 # Packages (can be used later)
 $wingetPackages = @(
@@ -55,6 +56,14 @@ catch {
   exit 1
 }
 
+# TODO try catch, improve variables, and Join Path
+Render-CloudInitTemplate `
+  -pythonExe     "$PSScriptRoot\python\.venv\Scripts\python.exe" `
+  -templatePath  "$PSScriptRoot\cloud-init.template.yaml" `
+  -configPath    "$PSScriptRoot\config.json" `
+  -outputPath    "$env:TEMP\cloud-init.generated.yaml" `
+  -logFile       $logFile
+
 try {
   New-WslInstance `
     -hostname        $config.hostname `
@@ -69,6 +78,7 @@ catch {
   exit 1
 }
 
+# TODO fix because Install-WslVpnToolkit should throw instead of return
 try {
   Install-WslVpnToolkit `
     -wslInstallDir $config.wslInstallDir `
