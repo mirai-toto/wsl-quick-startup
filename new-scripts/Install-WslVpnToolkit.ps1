@@ -23,7 +23,7 @@ function Install-WslVpnToolkit {
 
   # Create WSL instance
   New-WslInstance `
-    -wslInstanceName $distroName `
+    -hostname $distroName `
     -installDir      $wslInstallDir `
     -rootfsTar       $vpnToolkitFile `
     -cloudInitFile   $null `

@@ -2,7 +2,7 @@ function New-WslInstance {
   param (
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [string]$wslInstanceName,
+    [string]$hostname,
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
@@ -21,25 +21,25 @@ function New-WslInstance {
     [string]$logFile
   )
 
-  $fullInstallDir = Join-Path $installDir $wslInstanceName
+  $fullInstallDir = Join-Path $installDir $hostname
 
-  Write-Host "🔍 Checking if WSL instance '$wslInstanceName' exists..."
-  wsl.exe -d $wslInstanceName -- echo "Already exists." > $null 2>&1
+  Write-Host "🔍 Checking if WSL instance '$hostname' exists..."
+  wsl.exe -d $hostname -- echo "Already exists." > $null 2>&1
 
   if ($LASTEXITCODE -ne 0) {
-    Write-Host "🚧 Instance not found. Creating '$wslInstanceName'..."
+    Write-Host "🚧 Instance not found. Creating '$hostname'..."
     Write-Host "📦 Importing with cloud-init..."
 
-    & wsl.exe --import $wslInstanceName $full_installDir $rootfsTar --version 2 --cloud-init $cloudInitFile
+    & wsl.exe --import $hostname $full_installDir $rootfsTar --version 2 --cloud-init $cloudInitFile
 
     if ($LASTEXITCODE -ne 0) {
       Write-Host "❌ Failed to create WSL instance." -ForegroundColor Red
-      "[$(Get-Date)] ❌ Error: Failed to create '$wslInstanceName'" | Out-File -Append -FilePath $logFile
+      "[$(Get-Date)] ❌ Error: Failed to create '$hostname'" | Out-File -Append -FilePath $logFile
       exit 1
     }
 
-    Write-Host "✅ WSL instance '$wslInstanceName' created successfully." -ForegroundColor Green
+    Write-Host "✅ WSL instance '$hostname' created successfully." -ForegroundColor Green
   } else {
-    Write-Host "ℹ️ WSL instance '$wslInstanceName' already exists." -ForegroundColor Yellow
+    Write-Host "ℹ️ WSL instance '$hostname' already exists." -ForegroundColor Yellow
   }
 }

@@ -57,7 +57,7 @@ catch {
 
 try {
   New-WslInstance `
-    -wslInstanceName $config.wslInstanceName `
+    -hostname $config.hostname `
     -installDir      $config.wslInstallDir `
     -rootfsTar       $config.wslIsoFile `
     -cloudInitFile   $config.wslCloudInitFile `

@@ -1,12 +1,12 @@
 {
-    "wslInstanceName": "UbuntuWsl",
+    "hostname": "UbuntuWsl",
   
     "httpProxyWsl": "",
     "httpsProxyWsl": "",
     "noProxyWsl": "",
   
-    "devUser": "wsl-user",
-    "devPassword": "root",
+    "username": "wsl-user",
+    "password": "root",
   
     "wslInstallDir": "%userprofile%\\VMs",
     "wslIsoFile": "%userprofile%\\Downloads\\ubuntu-noble-wsl-amd64-ubuntu.rootfs.tar.gz",
