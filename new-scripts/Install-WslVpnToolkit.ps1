@@ -35,13 +35,14 @@ function Install-WslVpnToolkit {
 cat /app/wsl-vpnkit.service | sudo tee /etc/systemd/system/wsl-vpnkit.service
 sudo systemctl enable wsl-vpnkit
 sudo systemctl start wsl-vpnkit
-"@ -join "`n"
+"@
 
   $wslOutput = wsl.exe -d $distroName -- bash -c "$serviceCommand" 2>&1
   if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Failed to setup systemd service in $distroName."
     Write-Host $wslOutput
-    "[$(Get-Date)] ❌ Failed to setup systemd service in $distroName`n$wslOutput" | Out-File -FilePath $logFile -Append
+    "[$(Get-Date)] ❌ Failed to setup systemd service in $distroName" | Out-File -FilePath $logFile -Append
+    $wslOutput | Out-File -FilePath $logFile -Append
     return $false
   }
 
