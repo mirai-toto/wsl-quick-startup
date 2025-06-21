@@ -16,7 +16,7 @@ function Install-WingetPackages {
     $pkg = $packageId.Trim()
     Write-Host "🔍 Checking package: $pkg"
 
-    $alreadyInstalled = winget list --id $pkg -q | Select-String $pkg
+    $alreadyInstalled = winget list --id $pkg -e | Select-String $pkg
     if ($alreadyInstalled) {
       Write-Host "✅ $pkg is already installed."
       continue

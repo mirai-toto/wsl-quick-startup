@@ -4,21 +4,20 @@ $logDir     = Join-Path $PSScriptRoot "logs"
 $logFile    = Join-Path $logDir "script.log"
 
 # Expand and parse config
-$config = [Environment]::ExpandEnvironmentVariables((Get-Content $configFile -Raw)) | ConvertFrom-Json
+$config = ([Environment]::ExpandEnvironmentVariables((Get-Content $configFile -Raw)) -replace '\\', '/') | ConvertFrom-Json
 
 # Import helper scripts
 . "$PSScriptRoot\scripts\Install-WingetPackages.ps1"
-. "$PSScriptRoot\scripts\Setup-Wsl.ps1"
+. "$PSScriptRoot\scripts\Initialize-WSL.ps1"
 . "$PSScriptRoot\scripts\Ensure-WslIsoFile.ps1"
-. "$PSScriptRoot\scripts\Render-CloudInitTemplate.ps1"
+. "$PSScriptRoot\scripts\Convert-CloudInitTemplate.ps1"
 . "$PSScriptRoot\scripts\New-WslInstance.ps1"
 . "$PSScriptRoot\scripts\Install-WslVpnToolkit.ps1"
-
 
 # Winget packages dependencies
 $wingetPackages = @(
   "equalsraf.win32yank",
-  "Python.Python.3.12"
+  "Python.Python.3.13"
 )
 
 # 📁 Create logs directory if needed
@@ -48,7 +47,7 @@ catch {
 
 # ⚙️ Setup WSL
 try {
-  Setup-Wsl -logFile $logFile
+  Initialize-WSL -logFile $logFile
 }
 catch {
   Write-Host "❌ WSL installation failed: $_" -ForegroundColor Red
@@ -71,7 +70,7 @@ catch {
 
 # 📝 Render cloud-init template
 try {
-  Render-CloudInitTemplate `
+  Convert-CloudInitTemplate `
     -templatePath  (Join-Path $PSScriptRoot "cloud-init.template.yaml") `
     -configPath    $configFile `
     -outputPath    (Join-Path $env:TEMP "cloud-init.generated.yaml")

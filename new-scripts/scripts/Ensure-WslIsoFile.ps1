@@ -10,7 +10,7 @@ function Ensure-WslIsoFile {
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [string]$isoFile,
+    [string]$isoFile
   )
 
   # 📁 Create install dir if needed

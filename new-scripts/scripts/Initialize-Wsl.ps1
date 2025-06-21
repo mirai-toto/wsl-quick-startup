@@ -6,7 +6,7 @@ function IsFeatureEnabled {
   )
 
   $result = dism.exe /online /Get-FeatureInfo /featureName:$featureName | Select-String "State : Enabled"
-  return $result -ne $null
+  return $null -ne $result
 }
 
 function EnableWindowsFeature {
@@ -74,7 +74,7 @@ function CheckWSLIsInstalled {
   }
 }
 
-function Setup-WSL {
+function Initialize-WSL {
   param (
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]

@@ -1,6 +1,3 @@
-. "$PSScriptRoot\scripts\Ensure-WslIsoFile.ps1"
-. "$PSScriptRoot\scripts\New-WslInstance.ps1"
-
 function Install-WslVpnToolkit {
   param (
     [Parameter(Mandatory)]
