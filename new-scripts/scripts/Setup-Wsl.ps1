@@ -1,22 +1,33 @@
 function IsFeatureEnabled {
-  param ([string]$featureName)
+  param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$featureName
+  )
+
   $result = dism.exe /online /Get-FeatureInfo /featureName:$featureName | Select-String "State : Enabled"
   return $result -ne $null
 }
 
 function EnableWindowsFeature {
   param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
     [string]$featureName,
+
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
     [string]$logFile
   )
 
-  if (IsFeatureEnabled $featureName) {
+  if (IsFeatureEnabled -featureName $featureName) {
     Write-Output "✅ $featureName is already enabled. Skipping."
     return $true
   }
 
   Write-Output "🛠️ Enabling $featureName..."
   dism.exe /online /enable-feature /featureName:$featureName /all /norestart
+
   if ($LASTEXITCODE -ne 0) {
     "❌ Failed to enable $featureName" | Tee-Object -FilePath $logFile -Append
     return $false
@@ -27,10 +38,15 @@ function EnableWindowsFeature {
 }
 
 function UpdateWSLVersion {
-  param ([string]$logFile)
+  param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$logFile
+  )
 
   Write-Output "⬆️ Attempting to update WSL..."
   wsl.exe --update
+
   if ($LASTEXITCODE -ne 0) {
     "💥 WSL update failed!" | Tee-Object -FilePath $logFile -Append
     return $false
@@ -41,7 +57,11 @@ function UpdateWSLVersion {
 }
 
 function CheckWSLIsInstalled {
-  param ([string]$logFile)
+  param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$logFile
+  )
 
   Write-Output "🔎 Checking if WSL is installed..."
   try {
@@ -54,8 +74,12 @@ function CheckWSLIsInstalled {
   }
 }
 
-function Setup-Wsl {
-  param ([string]$logFile)
+function Setup-WSL {
+  param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$logFile
+  )
 
   Write-Output "🚀 Starting WSL setup..."
 
@@ -67,11 +91,11 @@ function Setup-Wsl {
     throw "⛔ Failed to update WSL."
   }
 
-  if (-not (EnableWindowsFeature "Microsoft-Windows-Subsystem-Linux" $logFile)) {
+  if (-not (EnableWindowsFeature -featureName "Microsoft-Windows-Subsystem-Linux" -logFile $logFile)) {
     throw "⛔ Failed to enable Microsoft-Windows-Subsystem-Linux."
   }
 
-  if (-not (EnableWindowsFeature "VirtualMachinePlatform" $logFile)) {
+  if (-not (EnableWindowsFeature -featureName "VirtualMachinePlatform" -logFile $logFile)) {
     throw "⛔ Failed to enable VirtualMachinePlatform."
   }
 

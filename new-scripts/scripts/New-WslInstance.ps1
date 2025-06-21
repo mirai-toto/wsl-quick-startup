@@ -12,13 +12,7 @@ function New-WslInstance {
     [ValidateNotNullOrEmpty()]
     [string]$rootfsTar,
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
-    [string]$cloudInitFile,
-
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
-    [string]$logFile
+    [string]$cloudInitFile
   )
 
   $fullInstallDir = Join-Path $installDir $hostname
@@ -28,14 +22,26 @@ function New-WslInstance {
 
   if ($LASTEXITCODE -ne 0) {
     Write-Host "🚧 Instance not found. Creating '$hostname'..."
-    Write-Host "📦 Importing with cloud-init..."
 
-    & wsl.exe --import $hostname $full_installDir $rootfsTar --version 2 --cloud-init $cloudInitFile
+    $importArgs = @(
+      "--import", $hostname,
+      $fullInstallDir,
+      $rootfsTar,
+      "--version", "2"
+    )
+
+    if ($cloudInitFile -and (Test-Path $cloudInitFile)) {
+      Write-Host "📦 Using cloud-init file: $cloudInitFile"
+      $importArgs += @("--cloud-init", $cloudInitFile)
+    } else {
+      Write-Host "⚠️ No valid cloud-init file provided. Skipping cloud-init import."
+    }
+
+    & wsl.exe @importArgs
 
     if ($LASTEXITCODE -ne 0) {
       Write-Host "❌ Failed to create WSL instance." -ForegroundColor Red
-      "[$(Get-Date)] ❌ Error: Failed to create '$hostname'" | Out-File -Append -FilePath $logFile
-      exit 1
+      throw "Failed to create WSL instance '$hostname'"
     }
 
     Write-Host "✅ WSL instance '$hostname' created successfully." -ForegroundColor Green

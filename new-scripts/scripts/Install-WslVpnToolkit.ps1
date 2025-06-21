@@ -1,13 +1,15 @@
-# Install-WslVpnToolkit.ps1
-
-. "$PSScriptRoot\Ensure-WslIsoFile.ps1"
-. "$PSScriptRoot\New-WslInstance.ps1"
+. "$PSScriptRoot\scripts\Ensure-WslIsoFile.ps1"
+. "$PSScriptRoot\scripts\New-WslInstance.ps1"
 
 function Install-WslVpnToolkit {
   param (
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
     [string]$wslInstallDir,
-    [string]$vpnToolkitUrl,
-    [string]$logFile
+
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$vpnToolkitUrl
   )
 
   $distroName = "wsl-vpnkit"
@@ -18,16 +20,14 @@ function Install-WslVpnToolkit {
   Ensure-WslIsoFile `
     -installDir $installDir `
     -isoUrl     $vpnToolkitUrl `
-    -isoFile    $vpnToolkitFile `
-    -logFile    $logFile
+    -isoFile    $vpnToolkitFile
 
   # Create WSL instance
   New-WslInstance `
-    -hostname $distroName `
-    -installDir      $wslInstallDir `
-    -rootfsTar       $vpnToolkitFile `
-    -cloudInitFile   $null `
-    -logFile         $logFile
+    -hostname       $distroName `
+    -installDir     $wslInstallDir `
+    -rootfsTar      $vpnToolkitFile `
+    -cloudInitFile  $null
 
   # Setup systemd service
   Write-Host "⚙️ Setting up systemd service in the distro..."
@@ -39,14 +39,10 @@ sudo systemctl start wsl-vpnkit
 
   $wslOutput = wsl.exe -d $distroName -- bash -c "$serviceCommand" 2>&1
   if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Failed to setup systemd service in $distroName."
+    Write-Host "❌ Failed to setup systemd service in $distroName." -ForegroundColor Red
     Write-Host $wslOutput
-    "[$(Get-Date)] ❌ Failed to setup systemd service in $distroName" | Out-File -FilePath $logFile -Append
-    $wslOutput | Out-File -FilePath $logFile -Append
-    return $false
+    throw "Failed to setup systemd service in $distroName"
   }
 
   Write-Host "✅ $distroName installed and started successfully."
-  return $true
-
 }

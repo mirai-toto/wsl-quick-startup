@@ -2,18 +2,13 @@ function Install-WingetPackages {
   param (
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [string[]]$packagesToInstall,
-
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
-    [string]$logFile
+    [string[]]$packagesToInstall
   )
 
   Write-Host "📦 Installing packages using winget..."
 
   if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     Write-Host "❌ winget is not installed. Please install it first." -ForegroundColor Red
-    "[$(Get-Date)] ❌ winget not installed" | Out-File -FilePath $logFile -Append
     throw "winget not installed"
   }
 
@@ -32,8 +27,7 @@ function Install-WingetPackages {
 
     if ($LASTEXITCODE -ne 0) {
       Write-Host "❌ Failed to install $pkg" -ForegroundColor Red
-      "[$(Get-Date)] ❌ Failed to install $pkg (code $LASTEXITCODE)" | Out-File -FilePath $logFile -Append
-      throw "winget failed for $pkg"
+      throw "winget failed for $pkg with exit code $LASTEXITCODE"
     }
 
     Write-Host "✅ $pkg installed successfully."
