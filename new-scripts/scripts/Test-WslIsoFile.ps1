@@ -1,4 +1,4 @@
-function Ensure-WslIsoFile {
+function Test-WslIsoFile {
   param (
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]

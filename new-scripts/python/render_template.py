@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from passlib.hash import sha512_crypt
 from jinja2 import Template, StrictUndefined, UndefinedError
@@ -31,6 +32,12 @@ try:
     rendered = template.render(config_data)
 except UndefinedError as e:
     print(f"❌ Template rendering error: {e}")
+    sys.exit(1)
+
+try:
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+except OSError as e:
+    print(f"❌ Failed to create output directory: {e}")
     sys.exit(1)
 
 # Write result

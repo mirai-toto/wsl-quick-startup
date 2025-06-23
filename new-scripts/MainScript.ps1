@@ -5,11 +5,12 @@ $logFile    = Join-Path $logDir "script.log"
 
 # Expand and parse config
 $config = ([Environment]::ExpandEnvironmentVariables((Get-Content $configFile -Raw)) -replace '\\', '/') | ConvertFrom-Json
+$cloudInitFile = Join-Path $env:USERPROFILE ".cloud-init\${config.hostname}.user-data"
 
 # Import helper scripts
 . "$PSScriptRoot\scripts\Install-WingetPackages.ps1"
 . "$PSScriptRoot\scripts\Initialize-WSL.ps1"
-. "$PSScriptRoot\scripts\Ensure-WslIsoFile.ps1"
+. "$PSScriptRoot\scripts\Test-WslIsoFile.ps1"
 . "$PSScriptRoot\scripts\Convert-CloudInitTemplate.ps1"
 . "$PSScriptRoot\scripts\New-WslInstance.ps1"
 . "$PSScriptRoot\scripts\Install-WslVpnToolkit.ps1"
@@ -55,9 +56,9 @@ catch {
   exit 1
 }
 
-# 💿 Ensure ISO file exists
+# 💿 Test ISO file exists
 try {
-  Ensure-WslIsoFile `
+  Test-WslIsoFile `
     -installDir  $config.wslInstallDir `
     -isoUrl      $config.wslDefaultIsoUrl `
     -isoFile     $config.wslIsoFile
@@ -71,9 +72,9 @@ catch {
 # 📝 Render cloud-init template
 try {
   Convert-CloudInitTemplate `
-    -templatePath  (Join-Path $PSScriptRoot "cloud-init.template.yaml") `
+    -templatePath  $config.cloudInitTemplateFile `
     -configPath    $configFile `
-    -outputPath    (Join-Path $env:TEMP "cloud-init.generated.yaml")
+    -outputPath    $cloudInitFile
 }
 catch {
   Write-Host "❌ Failed to render cloud-init template: $_" -ForegroundColor Red
@@ -86,8 +87,7 @@ try {
   New-WslInstance `
     -hostname        $config.hostname `
     -installDir      $config.wslInstallDir `
-    -rootfsTar       $config.wslIsoFile `
-    -cloudInitFile   $config.wslCloudInitFile
+    -rootfsTar       $config.wslIsoFile
 }
 catch {
   Write-Host "❌ Failed to create WSL instance: $_" -ForegroundColor Red

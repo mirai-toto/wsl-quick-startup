@@ -11,6 +11,6 @@
     "wslInstallDir": "%userprofile%/VMs",
     "wslIsoFile": "%userprofile%/Downloads/ubuntu-noble-wsl-amd64-ubuntu.rootfs.tar.gz",
     "wslDefaultIsoUrl": "https://cloud-images.ubuntu.com/wsl/releases/noble/current/ubuntu-noble-wsl-amd64-wsl.rootfs.tar.gz",
-    "wslCloudInitFile": "user-data.yaml",
+    "cloudInitTemplateFile": "cloud-init.template.yaml",
     "vpnToolkitUrl": "https://github.com/sakai135/wsl-vpnkit/releases/download/v0.4.1/wsl-vpnkit.tar.gz"
 }

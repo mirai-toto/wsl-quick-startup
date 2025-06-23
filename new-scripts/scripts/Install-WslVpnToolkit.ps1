@@ -13,8 +13,8 @@ function Install-WslVpnToolkit {
   $installDir = Join-Path $wslInstallDir $distroName
   $vpnToolkitFile = Join-Path $env:USERPROFILE "Downloads\wsl-vpnkit.tar.gz"
 
-  # Ensure ISO file exists
-  Ensure-WslIsoFile `
+  # Test ISO file exists
+  Test-WslIsoFile `
     -installDir $installDir `
     -isoUrl     $vpnToolkitUrl `
     -isoFile    $vpnToolkitFile
@@ -27,7 +27,6 @@ function Install-WslVpnToolkit {
     -cloudInitFile  $null
 
   # Setup systemd service
-  Write-Host "⚙️ Setting up systemd service in the distro..."
   $serviceCommand = @"
 cat /app/wsl-vpnkit.service | sudo tee /etc/systemd/system/wsl-vpnkit.service
 sudo systemctl enable wsl-vpnkit
