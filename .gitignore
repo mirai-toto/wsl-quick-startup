@@ -4,3 +4,4 @@ output
 setting_updated_output.json
 script.log
 logs/
+.vscode/
