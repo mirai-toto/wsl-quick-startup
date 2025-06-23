@@ -96,22 +96,33 @@ catch {
 }
 
 # ⏳ Wait for cloud-init to complete
+# ⏳ Wait for cloud-init to complete
 try {
   Write-Host "⏳ Waiting for cloud-init to finish..."
   wsl -d $config.hostname -- cloud-init status --wait
   $exitCode = $LASTEXITCODE
-  if ($exitCode -ne 0) {
-    Write-Host "❌ cloud-init status returned non-zero exit code: $exitCode" -ForegroundColor Red
-    "[$(Get-Date)] ❌ cloud-init failed with exit code: $exitCode" | Out-File -FilePath $logFile -Append
-    exit 1
+
+  switch ($exitCode) {
+    0 {
+      Write-Host "✅ cloud-init finished successfully."
+    }
+    2 {
+      Write-Host "⚠️ cloud-init finished with 'degraded' status (code 2), but no blocking errors." -ForegroundColor Yellow
+    }
+    default {
+      $message = "cloud-init failed with exit code: $exitCode"
+      Write-Host "❌ $message" -ForegroundColor Red
+      "[$(Get-Date)] ❌ $message" | Out-File -FilePath $logFile -Append
+      throw $message
+    }
   }
-  Write-Host "✅ cloud-init finished successfully."
 }
 catch {
   Write-Host "❌ cloud-init check failed or threw exception." -ForegroundColor Red
   "[$(Get-Date)] ❌ cloud-init status error: $_" | Out-File -FilePath $logFile -Append
   exit 1
 }
+
 
 # 🛠️ Optional: Install WSL VPN Toolkit
 try {
