@@ -5,7 +5,7 @@ $logFile    = Join-Path $logDir "script.log"
 
 # Expand and parse config
 $config = ([Environment]::ExpandEnvironmentVariables((Get-Content $configFile -Raw)) -replace '\\', '/') | ConvertFrom-Json
-$cloudInitFile = Join-Path $env:USERPROFILE ".cloud-init\${config.hostname}.user-data"
+$cloudInitFile = Join-Path $env:USERPROFILE ".cloud-init\$($config.hostname).user-data"
 
 # Import helper scripts
 . "$PSScriptRoot\scripts\Install-WingetPackages.ps1"
