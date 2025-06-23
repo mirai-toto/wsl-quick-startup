@@ -5,7 +5,7 @@
     "httpsProxyWsl": "",
     "noProxyWsl": "",
   
-    "username": "wsl-user",
+    "username": "wsluser",
     "password": "root",
   
     "wslInstallDir": "%userprofile%/VMs",

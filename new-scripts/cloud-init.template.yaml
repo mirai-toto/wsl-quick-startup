@@ -1,11 +1,12 @@
 #cloud-config
+## template: jinja
 hostname: {{ hostname }}
 manage_etc_hosts: true
-# Set environment variables for cloud-init runtime (not persistent)
-env:
-  http_proxy: {{ http_proxy | default('') }}
-  https_proxy: {{ https_proxy | default('') }}
-  no_proxy: {{ no_proxy | default('') }}
+
+apt:
+  http_proxy: "{{ http_proxy | default('') }}"
+  https_proxy: "{{ https_proxy | default('') }}"
+
 users:
   - name: {{ username }}
     groups: sudo
@@ -13,8 +14,7 @@ users:
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     lock_passwd: false
     passwd: "{{ user_password_hash }}"
-ssh_pwauth: true
-# Update and upgrade apt packages, then install listed ones
+
 package_update: true
 package_upgrade: true
 packages:
@@ -27,26 +27,23 @@ packages:
   - python3-pip
   - openjdk-21-jdk
   - npm
+
 write_files:
-   # Persist proxy settings
   - path: /etc/profile.d/proxy.sh
     permissions: '0644'
     content: |
       export http_proxy="{{ http_proxy | default('') }}"
       export https_proxy="{{ https_proxy | default('') }}"
       export no_proxy="{{ no_proxy | default('') }}"
-   # Configure proxy for apt
   - path: /etc/apt/apt.conf.d/95proxies
     permissions: '0644'
     content: |
       Acquire::http::Proxy "{{ http_proxy | default('') }}";
       Acquire::https::Proxy "{{ https_proxy | default('') }}";
-   # Enable WSL interoperability for binfmt
   - path: /usr/lib/binfmt.d/WSLInterop.conf
     permissions: '0644'
     content: |
       :WSLInterop:M::MZ::/init:PF
-   # WSL-specific configuration file
   - path: /etc/wsl.conf
     permissions: '0644'
     content: |
@@ -56,23 +53,18 @@ write_files:
       options = "metadata"
       [interop]
       appendWindowsPath = true
-runcmd: |
-  apt-get update
-  # Configure Git proxy settings
-  git config --system http.proxy "{{ http_proxy | default('') }}"
-  git config --system https.proxy "{{ https_proxy | default('') }}"
+      [user]
+      default={{ username }}
 
-  # Install Docker Engine and CLI using official convenience script
-  curl -fsSL https://get.docker.com | sh
-  usermod -aG docker {{ username }}
-  systemctl enable docker
-  systemctl start docker
+runcmd:
+  - git config --system http.proxy "{{ http_proxy | default('') }}"
+  - git config --system https.proxy "{{ https_proxy | default('') }}"
+  - curl -fsSL https://get.docker.com | sh
+  - usermod -aG docker {{ username }}
+  - systemctl enable docker
+  - systemctl start docker
+  - apt install -y docker-compose-plugin
+  - curl -sfL https://get.k3s.io | sh -
+  - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-  # Install Docker Compose v2 plugin (enables `docker compose` command)
-  apt install -y docker-compose-plugin
-
-  # Install k3s (lightweight Kubernetes)
-  curl -sfL https://get.k3s.io | sh -
-
-  # Install Helm (Kubernetes package manager)
-  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+final_message: "✅ cloud-init finished on {{ hostname }}"
